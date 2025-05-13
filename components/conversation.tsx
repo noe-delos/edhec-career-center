@@ -10,9 +10,10 @@ import { useConversation } from "@11labs/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play, Square, Camera, CameraOff, ArrowLeft } from "lucide-react";
+import { CameraOff, ArrowLeft } from "lucide-react";
 import { getQuestionsForCategory } from "@/lib/interview-questions";
 import { motion, useAnimationControls } from "framer-motion";
+import { Icon } from "@iconify/react";
 
 interface ConversationProps {
   interviewType: string;
@@ -31,6 +32,9 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
     null
   );
 
+  useEffect(() => {
+    if (!conversationStarted && !initializing) stopTimer();
+  }, [conversationStarted, initializing]);
   // Animation controls for the speaking animation
   const animationControls = useAnimationControls();
 
@@ -229,6 +233,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
 
   const stopConversation = useCallback(async () => {
     await conversation.endSession();
+    stopTimer();
     setConversationStarted(false);
   }, [conversation]);
 
@@ -390,7 +395,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
                     className="absolute inset-4 bg-white/50 rounded-full"
                   />
                   <motion.div className="relative z-10 text-white font-medium text-sm">
-                    {conversation.isSpeaking ? "Parlant" : "En attente"}
+                    {conversation.isSpeaking ? "" : "En attente"}
                   </motion.div>
                 </div>
               </div>
@@ -405,7 +410,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
                 autoPlay
                 playsInline
                 muted
-                className="h-full w-full object-cover rounded-xl bg-white"
+                className="h-full w-full object-cover rounded-xl bg-white transform scale-x-[-1]"
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center bg-gray-100">
@@ -431,27 +436,27 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
             variant="outline"
             size="icon"
             onClick={toggleCamera}
-            className="rounded-full h-14 w-14 shadow-md"
+            className="rounded-full h-14 w-14 shadow-md hover:cursor-pointer"
           >
             {cameraEnabled ? (
-              <CameraOff className="h-6 w-6" />
+              <Icon icon="bxs:camera-off" className="size-5" />
             ) : (
-              <Camera className="h-6 w-6" />
+              <Icon icon="tabler:camera-filled" className="size-5" />
             )}
           </Button>
 
           {urlFetchFailed ? (
             <Button
-              className="rounded-full h-14 w-14 shadow-md"
+              className="rounded-full h-14 w-14 shadow-md hover:cursor-pointer"
               size="icon"
               onClick={startConversation}
               style={{ backgroundColor: "#A02235" }}
             >
-              <Play className="h-6 w-6" />
+              <Icon icon="solar:play-bold" className="h-6 w-6" />
             </Button>
           ) : (
             <Button
-              className="rounded-full h-14 w-14 shadow-md"
+              className="rounded-full h-14 w-14 shadow-md hover:cursor-pointer"
               size="icon"
               disabled={conversationStarted || loadingSignedUrl}
               onClick={startConversation}
@@ -460,7 +465,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
               {initializing || loadingSignedUrl ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
               ) : (
-                <Play className="h-6 w-6" />
+                <Icon icon="solar:play-bold" className="h-6 w-6" />
               )}
             </Button>
           )}
@@ -470,9 +475,9 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
             size="icon"
             disabled={!conversationStarted}
             onClick={stopConversation}
-            className="rounded-full h-14 w-14 shadow-md"
+            className="rounded-full h-14 w-14 shadow-md hover:cursor-pointer"
           >
-            <Square className="h-6 w-6" />
+            <Icon icon="solar:stop-bold" className="h-6 w-6" />
           </Button>
         </div>
 
